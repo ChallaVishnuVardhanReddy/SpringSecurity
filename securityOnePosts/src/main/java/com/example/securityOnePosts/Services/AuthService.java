@@ -1,6 +1,7 @@
 package com.example.securityOnePosts.Services;
 
 import com.example.securityOnePosts.DTO.LoginDto;
+import com.example.securityOnePosts.DTO.LoginResponseDto;
 import com.example.securityOnePosts.DTO.SignUpDto;
 import com.example.securityOnePosts.DTO.UserDto;
 import com.example.securityOnePosts.Entities.User;
@@ -39,13 +40,21 @@ public class AuthService {
         return modelMapper.map(returnUser,UserDto.class);
     }
 
-    public String login(LoginDto loginDto) {
+    public LoginResponseDto login(LoginDto loginDto) {
 
         Authentication authentication=authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(loginDto.getEmail(),loginDto.getPassword())
         );
         User user=(User) authentication.getPrincipal();
-        return jwtSerice.generateToken(user);
+        String accessToken= jwtSerice.generateToken(user);
+        String refreshToken= jwtSerice.generateRefreshToken(user);
+        return new LoginResponseDto(user.getId(),accessToken,refreshToken);
+    }
 
+    public LoginResponseDto refreshToken(String refreshToken) {
+        Long userId=jwtSerice.getUserIdFromToken(refreshToken);
+        User user=userService.getUserDetails(userId);
+        String accessToken= jwtSerice.generateToken(user);
+        return new LoginResponseDto(user.getId(),accessToken,refreshToken);
     }
 }

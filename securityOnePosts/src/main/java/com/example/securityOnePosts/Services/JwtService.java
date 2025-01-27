@@ -28,7 +28,16 @@ public class JwtService {
                 .claim("email",user.getEmail())
                 .claim("roles", Set.of("ADMIN","USER"))
                 .issuedAt(new Date())
-                .expiration(new Date(System.currentTimeMillis() + 1000 * 60))
+                .expiration(new Date(System.currentTimeMillis() + 1000 * 60 *10))
+                .signWith(getSecretKey())
+                .compact();
+    }
+    //Generating refresh Token
+    public String generateRefreshToken(User user){
+        return Jwts.builder()
+                .subject(user.getId().toString())
+                .issuedAt(new Date())
+                .expiration(new Date(System.currentTimeMillis() + 1000L*60*60*24*30*6))
                 .signWith(getSecretKey())
                 .compact();
     }
