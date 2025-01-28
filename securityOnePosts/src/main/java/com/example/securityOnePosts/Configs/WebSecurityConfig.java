@@ -1,7 +1,9 @@
 package com.example.securityOnePosts.Configs;
 
 import com.example.securityOnePosts.Filter.JwtAuthFilter;
+import com.example.securityOnePosts.handlers.OAuth2Successhandler;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -19,25 +21,31 @@ import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+@Slf4j
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class WebSecurityConfig {
 
     private final JwtAuthFilter jwtAuthFilter;
+    private final OAuth2Successhandler oAuth2SuccessHandler;
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception
     {
         httpSecurity
                 .authorizeHttpRequests(auth-> auth
-                        .requestMatchers("/posts","/auth/**").permitAll()
+                        .requestMatchers("/posts","/auth/**","/home.html").permitAll()
                        // .requestMatchers("/posts/**").hasAnyRole("ADMIN")
                         .anyRequest().authenticated())
                 .csrf(csrfConfig->csrfConfig.disable())
                 .sessionManagement(sessionConfig->sessionConfig
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
-                //.formLogin((Customizer.withDefaults()));
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+                .oauth2Login(oauth2Config->oauth2Config
+                    .failureUrl("/login?error=true")
+                .successHandler(oAuth2SuccessHandler)
+                );
+        //.formLogin((Customizer.withDefaults()));
         return httpSecurity.build();
     }
 /*
