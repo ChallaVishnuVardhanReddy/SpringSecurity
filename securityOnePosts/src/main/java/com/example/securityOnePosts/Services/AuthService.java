@@ -28,6 +28,7 @@ public class AuthService {
      private final ModelMapper modelMapper;
      private final AuthenticationManager authenticationManager;
      private final JwtService jwtSerice;
+     private final SessionService sessionService;
     public UserDto signup(SignUpDto signUpDto) {
         Optional<User> user = userRepository.findByEmail(signUpDto.getEmail());
         if(user.isPresent())
@@ -48,11 +49,13 @@ public class AuthService {
         User user=(User) authentication.getPrincipal();
         String accessToken= jwtSerice.generateToken(user);
         String refreshToken= jwtSerice.generateRefreshToken(user);
+        sessionService.generateNewSession(user,refreshToken);
         return new LoginResponseDto(user.getId(),accessToken,refreshToken);
     }
 
     public LoginResponseDto refreshToken(String refreshToken) {
         Long userId=jwtSerice.getUserIdFromToken(refreshToken);
+        sessionService.validateSession(refreshToken);
         User user=userService.getUserDetails(userId);
         String accessToken= jwtSerice.generateToken(user);
         return new LoginResponseDto(user.getId(),accessToken,refreshToken);
