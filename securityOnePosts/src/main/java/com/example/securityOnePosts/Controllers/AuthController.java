@@ -28,11 +28,15 @@ public class AuthController {
     private String deployEnv;
     @Autowired
     private AuthService authService;
+
+
     @PostMapping("/signup")
     public ResponseEntity<UserDto> singupuser(@RequestBody SignUpDto signUpDto){
         UserDto userDto=authService.signup(signUpDto);
         return ResponseEntity.ok(userDto);
     }
+
+
     @PostMapping("/login")
     public ResponseEntity<LoginResponseDto> loginuser(@RequestBody LoginDto loginDto, HttpServletResponse httpServletResponse)
     {
