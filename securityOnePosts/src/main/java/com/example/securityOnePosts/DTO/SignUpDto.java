@@ -1,5 +1,6 @@
 package com.example.securityOnePosts.DTO;
 
+import com.example.securityOnePosts.Entities.enums.Permission;
 import com.example.securityOnePosts.Entities.enums.Role;
 import lombok.Data;
 import lombok.Getter;
@@ -16,4 +17,5 @@ public class SignUpDto {
     private String username;
     private String password;
     private Set<Role> roles;
+    private Set<Permission> permissions;
 }

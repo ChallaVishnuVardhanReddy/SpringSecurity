@@ -1,5 +1,6 @@
 package com.example.securityOnePosts.Configs;
 
+import com.example.securityOnePosts.Entities.enums.Permission;
 import com.example.securityOnePosts.Filter.JwtAuthFilter;
 import com.example.securityOnePosts.handlers.OAuth2Successhandler;
 import lombok.RequiredArgsConstructor;
@@ -44,7 +45,15 @@ public class WebSecurityConfig {
                         .requestMatchers(publicRoutes).permitAll()
                         .requestMatchers( HttpMethod.GET,"/posts/**").permitAll()
                         .requestMatchers(HttpMethod.POST,"/posts/**")
-                        .hasAnyRole(ADMIN.name(),CREATOR.name())
+                               .hasAnyRole(ADMIN.name(),CREATOR.name())
+                        .requestMatchers(HttpMethod.POST,"/posts/**")
+                               .hasAnyAuthority(Permission.POST_CREATE.name())
+                        .requestMatchers(HttpMethod.GET,"/posts/**")
+                               .hasAnyAuthority(Permission.POST_VIEW.name())
+                        .requestMatchers(HttpMethod.PUT,"/posts/**")
+                               .hasAnyAuthority(Permission.POST_UPDATE.name())
+                        .requestMatchers(HttpMethod.DELETE,"/posts/**")
+                                .hasAnyAuthority(Permission.POST_DELETE.name())
                         .anyRequest().authenticated())
                 .csrf(csrfConfig->csrfConfig.disable())
                 .sessionManagement(sessionConfig->sessionConfig
